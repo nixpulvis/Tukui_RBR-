@@ -1,10 +1,11 @@
 local T, C, L = unpack(Tukui)
+local data = TukuiDataPerChar
 
 -- inital settings
-local specialbuff = 80398
+if not data.specialbuff then
+	TukuiDataPerChar.specialbuff = 80398
+end
 local posn = {"TOP", UIParent, "TOP", 0, -3}
-
-local data = TukuiDataPerChar
 
 --Locals
 local flaskbuffs = {
@@ -259,15 +260,15 @@ local function OnAuraChange(self, event, arg1, unit)
 		Spell6Frame.id = Spell6Buff
 	end	
 	
-	local spellname = select(1, GetSpellInfo(specialbuff))
+	local spellname = select(1, GetSpellInfo(TukuiDataPerChar.specialbuff))
 	if UnitAura("player", spellname) then
 		SpecialBuffFrame:SetAlpha(1)
-		SpecialBuffFrame.t:SetTexture(select(3, GetSpellInfo(specialbuff)))
+		SpecialBuffFrame.t:SetTexture(select(3, GetSpellInfo(TukuiDataPerChar.specialbuff)))
 	else
 		SpecialBuffFrame:SetAlpha(0.2)
-		SpecialBuffFrame.t:SetTexture(select(3, GetSpellInfo(specialbuff)))
+		SpecialBuffFrame.t:SetTexture(select(3, GetSpellInfo(TukuiDataPerChar.specialbuff)))
 	end
-	SpecialBuffFrame.id = specialbuff
+	SpecialBuffFrame.id = TukuiDataPerChar.specialbuff
 end
 
 --Toggling functions
@@ -311,7 +312,7 @@ end
 -- Only called on the SpecialBuffFrame
 local function UpdateSpecialBuff(id)
 	if GetSpellInfo(id) then
-		specialbuff = id 
+		TukuiDataPerChar.specialbuff = id 
 	elseif id == "" then
 		print("You did not enter anything")
 	else
