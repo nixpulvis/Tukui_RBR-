@@ -1,0 +1,10 @@
+﻿## Interface: 40300
+## Author: Epicgrim
+## Credits to: Elv
+## Version: 1.5
+## Title: |cffC495DDTukui|r Raid Buff Reminder+
+## Notes: better raid buff monitor
+## RequiredDeps: Tukui
+## Website: www.tukui.org
+
+core.lua
