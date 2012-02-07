@@ -1,8 +1,10 @@
 local T, C, L = unpack(Tukui)
 
--- Settings
+-- inital settings
 local specialbuff = 80398
 local posn = {"TOP", UIParent, "TOP", 0, -3}
+
+local data = TukuiDataPerChar
 
 --Locals
 local flaskbuffs = {
@@ -268,6 +270,7 @@ local function OnAuraChange(self, event, arg1, unit)
 	SpecialBuffFrame.id = specialbuff
 end
 
+--Toggling functions
 local enable = true 
 local function ToggleLocked()	
 	
@@ -299,9 +302,22 @@ local function ToggleLocked()
 	if enable then enable = false else enable = true end
 end
 
+-- reset Position
 local function ResetPosition()
 	RaidBuffAnchor:ClearAllPoints()
 	RaidBuffAnchor:Point(unpack(posn))
+end
+
+-- Only called on the SpecialBuffFrame
+local function UpdateSpecialBuff(id)
+	if GetSpellInfo(id) then
+		specialbuff = id 
+	elseif id == "" then
+		print("You did not enter anything")
+	else
+		print(id.." is not a valid SpellID")
+	end
+	OnAuraChange()
 end
 
 local optionsFrame = CreateFrame("Frame", "RBR_MenuFrame", UIParent, "UIDropDownMenuTemplate")
@@ -314,6 +330,12 @@ local function microMenuGenerator(self, button)
 			{text = "Reset Position",
 			func = ResetPosition},
 		}
+		
+		if self:GetName() == "SpecialBuffFrame" then
+			local opt = { text = "Set Buff", func = function() SpecialBuffConfigFrame:Show() end}
+			tinsert(microMenu, opt) 
+		end
+		
 		EasyMenu(microMenu, optionsFrame, "cursor", xoff, 0, "MENU", 2)
 	end
 end
@@ -356,6 +378,37 @@ raidbuff_reminder:RegisterEvent("CHARACTER_POINTS_CHANGED")
 raidbuff_reminder:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 raidbuff_reminder:SetScript("OnEvent", OnAuraChange)
 raidbuff_reminder:SetScript("OnMouseUp", microMenuGenerator)
+
+--edit box for the special buff
+specialconfig = CreateFrame("Frame", "SpecialBuffConfigFrame", raidbuff_reminder)
+specialconfig:SetTemplate()
+specialconfig:Size(150, raidbuff_reminder:GetHeight())
+specialconfig:Point("LEFT", raidbuff_reminder, "RIGHT", 3, 0)
+--label
+specialconfig.text = specialconfig:CreateFontString(nil, "OVERLAY")	
+specialconfig.text:SetPoint("LEFT", specialconfig, "LEFT", 4, 0)
+specialconfig.text:SetFont(C.media.font, 12)
+specialconfig.text:SetText("SpellID")
+--ok button
+specialconfig.ok = CreateFrame("Button", nil, specialconfig)
+specialconfig.ok:SetTemplate()
+specialconfig.ok:Size(raidbuff_reminder:GetHeight()-6, raidbuff_reminder:GetHeight()-6)
+specialconfig.ok:Point("RIGHT", specialconfig, "RIGHT", -3, 0)
+specialconfig.t = specialconfig.ok:CreateFontString(nil, "OVERLAY")	
+specialconfig.t:SetPoint("CENTER", specialconfig.ok, "CENTER", 0, 0)
+specialconfig.t:SetFont(C.media.font, 12)
+specialconfig.t:SetText("OK")
+-- edit box
+specialconfig.edit = CreateFrame("EditBox", nil, specialconfig)
+specialconfig.edit:SetTemplate()
+specialconfig.edit:Size(70, raidbuff_reminder:GetHeight()-6)
+specialconfig.edit:Point("RIGHT", specialconfig.ok, "LEFT", -3, 0)
+specialconfig.edit:SetNumeric()
+specialconfig.edit:EnableMouse(true)
+specialconfig.edit:SetFontObject(ChatFontNormal)
+--ok button click
+specialconfig.ok:SetScript("OnClick", function(self, button, down) UpdateSpecialBuff(specialconfig.edit:GetText()) specialconfig:Hide() end)
+specialconfig:Hide()
 
 --Function to create buttons
 local function CreateButton(name, relativeTo, firstbutton)
