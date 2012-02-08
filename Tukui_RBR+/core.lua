@@ -245,7 +245,7 @@ local function OnAuraChange(self, event, arg1, unit)
 		end
 		Spell5Frame.id = Spell5Buff
 	end	
-
+	
 	for i, Spell6Buff in pairs(Spell6Buff) do
 		local spellname = select(1, GetSpellInfo(Spell6Buff))
 		if UnitAura("player", spellname) then
@@ -604,7 +604,7 @@ local function AnotherOnAuraChange(self, event, arg1, unit)
 				_G[key.."mini"..i]:SetAlpha(0.2)
 			end
 		end
-
+		
 		for i, v in ipairs(value) do
 			local spellname = select(1, GetSpellInfo(v))
 			_G[key.."Frame"].spell = v
@@ -618,6 +618,15 @@ local function AnotherOnAuraChange(self, event, arg1, unit)
 			end
 		end
 	end
+	
+	--fucking pallys
+	local percentmod = select(7, UnitDamage("player"))
+	if ceil(percentmod*100) >= 103 then
+		if _G["dmg3Frame"]:GetAlpha() == 0.2 then
+			_G["dmg3Frame"]:SetAlpha(1)
+			_G["dmg3Frame"].t:SetTexture(select(3, GetSpellInfo(31876)))
+		end
+	end
 end
 
 local raidbuffsummury = CreateFrame("Frame", "RaidBuffSummery", UIParent)
@@ -629,6 +638,7 @@ raidbuffsummury:SetClampedToScreen(true)
 raidbuffsummury:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
 raidbuffsummury:RegisterEvent("UNIT_INVENTORY_CHANGED")
 raidbuffsummury:RegisterEvent("UNIT_AURA")
+raidbuffsummury:RegisterEvent("UNIT_DAMAGE")
 raidbuffsummury:RegisterEvent("PLAYER_REGEN_ENABLED")
 raidbuffsummury:RegisterEvent("PLAYER_REGEN_DISABLED")
 raidbuffsummury:RegisterEvent("PLAYER_ENTERING_WORLD")
